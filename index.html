@@ -98,6 +98,16 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">代码块</span><br></pre></td></tr></table></figure>
 <p>1.<br>2.<br>3.</p>
 <p>*<br>*<br>*</p>
+<h2 id="RPC框架"><a href="#RPC框架" class="headerlink" title="RPC框架"></a>RPC框架</h2><h4 id="什么是RPC框架？"><a href="#什么是RPC框架？" class="headerlink" title="什么是RPC框架？"></a>什么是RPC框架？</h4><p>RPC(Remote Procedure call):远程过程调用<br>RPC是一个通信协议，位于OSI七层模型的会话层,是建立在TCP/IP基础上的通信协议.</p>
+<h5 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h5><p>在分布式系统下,一个程序功的实现被分为多个模块部署到不同的服务器上,不同模块之间可能要互相调用对方的方法.<br>RPC框架就是能够让每个模块能够互相调用对方的方法,并且让该调用看起来好像是在本地调用一样.</p>
+<h5 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h5><p>RPC基于C/S(客户端/服务端)模式,客户端发送请求,服务端响应.</p>
+<h5 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h5><ul>
+<li>实现不同语言间的通信</li>
+<li>不需要了解底层协议,每次调用就好像在调用本地方法一样<h3 id="调用过程"><a href="#调用过程" class="headerlink" title="调用过程"></a>调用过程</h3></li>
+</ul>
+<ol>
+<li>客户端发送<br>! [image] (<a target="_blank" rel="noopener" href="https://www.baidu.com/img/flexible/logo/pc/result.png">https://www.baidu.com/img/flexible/logo/pc/result.png</a>)</li>
+</ol>
 
       
     </div>
