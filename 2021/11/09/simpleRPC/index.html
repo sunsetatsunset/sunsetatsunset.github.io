@@ -6,11 +6,15 @@
   
   <title>liaominghao</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta property="og:type" content="website">
+  <meta name="description" content="#最简易的RPC实现示例 下面我们以一个简单的加法计算为例，演示以下一个远程调用是如何实现的我们知道，远程调用需要一个客户端，一个服务端 ##客户端客户端为方法的调用方，只需要声明方法，不需要具体的实现 123456789101112public interface Calculator &amp;#123;    int add(int a, int b);&amp;#125;&#x2F;&#x2F;消费者，调用add方法，参数为">
+<meta property="og:type" content="article">
 <meta property="og:title" content="liaominghao">
-<meta property="og:url" content="http://example.com/index.html">
+<meta property="og:url" content="http://example.com/2021/11/09/simpleRPC/index.html">
 <meta property="og:site_name" content="liaominghao">
+<meta property="og:description" content="#最简易的RPC实现示例 下面我们以一个简单的加法计算为例，演示以下一个远程调用是如何实现的我们知道，远程调用需要一个客户端，一个服务端 ##客户端客户端为方法的调用方，只需要声明方法，不需要具体的实现 123456789101112public interface Calculator &amp;#123;    int add(int a, int b);&amp;#125;&#x2F;&#x2F;消费者，调用add方法，参数为">
 <meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2021-11-09T07:42:52.577Z">
+<meta property="article:modified_time" content="2021-11-09T07:40:06.046Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary">
   
@@ -69,113 +73,7 @@
 </header>
 
       <div class="outer">
-        <section id="main">
-  
-    <article id="post-RPC" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2021/11/09/RPC/" class="article-date">
-  <time class="dt-published" datetime="2021-11-09T07:42:52.637Z" itemprop="datePublished">2021-11-09</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h2 id="RPC框架进阶版"><a href="#RPC框架进阶版" class="headerlink" title="RPC框架进阶版"></a>RPC框架进阶版</h2><p>相比于之前的简易版RPC框架，本文对RPC进行了如下改进</p>
-<ol>
-<li>使用Netty作为通信框架，支持多线程</li>
-<li>使用JDK动态代理代理调用方法，提高了代理的复用性</li>
-<li>使用protostuff作为序列化工具</li>
-<li>使用zookeeper作为注册中心</li>
-</ol>
-<p>###整体流程</p>
-<h4 id="客户端"><a href="#客户端" class="headerlink" title="客户端"></a>客户端</h4><p>首先，客户端调用方法时，需要去zookeeper注册中心发现服务</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ZookeeperServiceDiscoverer</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> ZkClient zkClient;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ZookeeperServiceDiscoverer</span><span class="params">(String zkAddress)</span> </span>&#123;</span><br><span class="line">        zkClient = <span class="keyword">new</span> ZkClient(zkAddress);</span><br><span class="line">        zkClient.setZkSerializer(<span class="keyword">new</span> ZookeeperSerializer());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 用Zookeeper客户端根据服务器名获取服务列表</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> name 服务名称</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 服务名</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;Service&gt; <span class="title">getService</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">        String servicePath = ZkConstant.ZK_SERVICE_PATH + ZkConstant.PATH_DELIMITER + name + <span class="string">&quot;/service&quot;</span>;</span><br><span class="line">        List&lt;String&gt; children = zkClient.getChildren(servicePath);</span><br><span class="line">        <span class="keyword">return</span> Optional.ofNullable(children).orElse(<span class="keyword">new</span> ArrayList&lt;&gt;()).stream().map(s -&gt; &#123;</span><br><span class="line">            String dech = <span class="keyword">null</span>;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                dech = URLDecoder.decode(s, ZkConstant.UTF_8);</span><br><span class="line">            &#125;<span class="keyword">catch</span> (UnsupportedEncodingException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> JSON.parseObject(dech, Service.class);</span><br><span class="line">        &#125;).collect(Collectors.toList());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>通过Netty建立网络连接发送请求</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2021/11/09/RPC/" data-id="ckvrse1oo000164whb3gfax21" data-title="" class="article-share-link">Share</a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-NIO" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2021/11/09/NIO/" class="article-date">
-  <time class="dt-published" datetime="2021-11-09T07:42:52.620Z" itemprop="datePublished">2021-11-09</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h2 id="JAVA-NIO简介"><a href="#JAVA-NIO简介" class="headerlink" title="JAVA NIO简介"></a>JAVA NIO简介</h2><p>Java New IO 是1.4引进的异步IO，与OIO相对应(old IO),由于之前的IO是阻塞的，效率较低，故引入了非阻塞的NIO，也叫做Non-Block IO</p>
-<h4 id="Java-NIO由三个核心部分组成"><a href="#Java-NIO由三个核心部分组成" class="headerlink" title="Java NIO由三个核心部分组成"></a>Java NIO由三个核心部分组成</h4><ol>
-<li>channel<br>在OIO中，一个连接的使用有两个流：输入流和输出流，分别进行读和写，而NIO使用了channel. channel可以看作是输入流和输出流的结合，连接的IO操作都可用channel来完成</li>
-<li>selector<br>channel实现多路复用的基础就是selector，将要进行状态查询的channel注册到selector中，selector内部不断轮询channel查看是否有IO事件(读、写、关闭连接等)，通过selector就能通过一个线程来管理多个channel了</li>
-<li>buffer<br>传统的IO是面向stream流的，而NIO是面向buffer缓冲区的，我们对channel的读写都是通过buffer的</li>
-</ol>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2021/11/09/NIO/" data-id="ckvrse1oq000364whee163mib" data-title="" class="article-share-link">Share</a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-IOMulpitlexing" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2021/11/09/IOMulpitlexing/" class="article-date">
-  <time class="dt-published" datetime="2021-11-09T07:42:52.593Z" itemprop="datePublished">2021-11-09</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h2 id="IO多路复用"><a href="#IO多路复用" class="headerlink" title="IO多路复用"></a>IO多路复用</h2><p>概念：单个线程通过跟踪记录每个socket(I/O)的状态来同时管理多个I/O流</p>
-<p>事件驱动模型的实现就是用IO多路复用来实现的，而实现IO多路复用有三个机制：select，poll，epoll</p>
-<p>select的连接有限，只有1024个，而且是线程不安全的，而且poll的连接数没有限制，也是线程不安全的，epoll则解决了上述问题，一帮多路复用都使用epoll，但epoll只能在linux使用</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2021/11/09/IOMulpitlexing/" data-id="ckvrse1oh000064wh909nfr49" data-title="" class="article-share-link">Share</a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-simpleRPC" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+        <section id="main"><article id="post-simpleRPC" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
     <a href="/2021/11/09/simpleRPC/" class="article-date">
   <time class="dt-published" datetime="2021-11-09T07:42:52.577Z" itemprop="datePublished">2021-11-09</time>
@@ -219,154 +117,28 @@
     </footer>
   </div>
   
-</article>
-
-
-
+    
+<nav id="article-nav">
   
-    <article id="post-testImage" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2021/11/08/testImage/" class="article-date">
-  <time class="dt-published" datetime="2021-11-08T12:43:53.000Z" itemprop="datePublished">2021-11-08</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
+    <a href="/2021/11/09/IOMulpitlexing/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
         
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2021/11/08/testImage/">testImage</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <p>! [image] (profile.jpg)<br><img src="https://www.baidu.com/img/flexible/logo/pc/result.png" alt="image"><br><img src="/.com//profile.jpg" alt="image"></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2021/11/08/testImage/" data-id="ckvqnr67s0000u4wh9wn10xyk" data-title="testImage" class="article-share-link">Share</a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-test" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2021/11/05/test/" class="article-date">
-  <time class="dt-published" datetime="2021-11-05T09:13:28.384Z" itemprop="datePublished">2021-11-05</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
+          (no title)
         
+      </div>
+    </a>
   
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2021/11/05/test/">一级标题</a>
-    </h1>
   
+    <a href="/2021/11/08/testImage/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">testImage</div>
+    </a>
+  
+</nav>
 
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <p>##二级<br>###三级<br>####四级<br>#####五级<br>######六级</p>
-<p>你好 <code>区域代码</code></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">代码块</span><br></pre></td></tr></table></figure>
-<p>1.<br>2.<br>3.</p>
-<p>*<br>*<br>*</p>
-<h2 id="RPC框架"><a href="#RPC框架" class="headerlink" title="RPC框架"></a>RPC框架</h2><h4 id="什么是RPC框架？"><a href="#什么是RPC框架？" class="headerlink" title="什么是RPC框架？"></a>什么是RPC框架？</h4><p>RPC(Remote Procedure call):远程过程调用<br>RPC是一个通信协议，位于OSI七层模型的会话层,是建立在TCP/IP基础上的通信协议.</p>
-<h5 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h5><p>在分布式系统下,一个程序功的实现被分为多个模块部署到不同的服务器上,不同模块之间可能要互相调用对方的方法.<br>RPC框架就是能够让每个模块能够互相调用对方的方法,并且让该调用看起来好像是在本地调用一样.</p>
-<h5 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h5><p>RPC基于C/S(客户端/服务端)模式,客户端发送请求,服务端响应.</p>
-<h5 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h5><ul>
-<li>实现不同语言间的通信</li>
-<li>不需要了解底层协议,每次调用就好像在调用本地方法一样<h3 id="调用过程"><a href="#调用过程" class="headerlink" title="调用过程"></a>调用过程</h3></li>
-</ul>
-<ol>
-<li>客户端发送<br>! [image] (<a target="_blank" rel="noopener" href="https://www.baidu.com/img/flexible/logo/pc/result.png">https://www.baidu.com/img/flexible/logo/pc/result.png</a>)</li>
-</ol>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2021/11/05/test/" data-id="ckvmbfst30001rowhg6x8cepv" data-title="一级标题" class="article-share-link">Share</a>
-      
-      
-      
-    </footer>
-  </div>
   
 </article>
-
-
-
-  
-    <article id="post-hello-world" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2021/11/05/hello-world/" class="article-date">
-  <time class="dt-published" datetime="2021-11-05T08:34:30.984Z" itemprop="datePublished">2021-11-05</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2021/11/05/hello-world/">Hello World</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2021/11/05/hello-world/" data-id="ckvmbfsss0000rowh3jgq6ezy" data-title="Hello World" class="article-share-link">Share</a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
 
 
 </section>

@@ -4,13 +4,17 @@
   <meta charset="utf-8">
   
   
-  <title>Archives: 2021 | liaominghao</title>
+  <title>liaominghao</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta property="og:type" content="website">
+  <meta name="description" content="JAVA NIO简介Java New IO 是1.4引进的异步IO，与OIO相对应(old IO),由于之前的IO是阻塞的，效率较低，故引入了非阻塞的NIO，也叫做Non-Block IO Java NIO由三个核心部分组成 channel在OIO中，一个连接的使用有两个流：输入流和输出流，分别进行读和写，而NIO使用了channel. channel可以看作是输入流和输出流的结合，连接的IO操作">
+<meta property="og:type" content="article">
 <meta property="og:title" content="liaominghao">
-<meta property="og:url" content="http://example.com/archives/2021/index.html">
+<meta property="og:url" content="http://example.com/2021/11/09/NIO/index.html">
 <meta property="og:site_name" content="liaominghao">
+<meta property="og:description" content="JAVA NIO简介Java New IO 是1.4引进的异步IO，与OIO相对应(old IO),由于之前的IO是阻塞的，效率较低，故引入了非阻塞的NIO，也叫做Non-Block IO Java NIO由三个核心部分组成 channel在OIO中，一个连接的使用有两个流：输入流和输出流，分别进行读和写，而NIO使用了channel. channel可以看作是输入流和输出流的结合，连接的IO操作">
 <meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2021-11-09T07:42:52.620Z">
+<meta property="article:modified_time" content="2021-11-09T07:40:01.204Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary">
   
@@ -69,129 +73,57 @@
 </header>
 
       <div class="outer">
-        <section id="main">
-  
-  
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2021" class="archive-year">2021</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2021/11/09/RPC/" class="archive-article-date">
-  <time class="dt-published" datetime="2021-11-09T07:42:52.637Z" itemprop="datePublished">Nov 9</time>
+        <section id="main"><article id="post-NIO" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2021/11/09/NIO/" class="article-date">
+  <time class="dt-published" datetime="2021-11-09T07:42:52.620Z" itemprop="datePublished">2021-11-09</time>
 </a>
-      
-    </header>
+    
   </div>
-</article>
-  
+  <div class="article-inner">
     
     
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2021/11/09/NIO/" class="archive-article-date">
-  <time class="dt-published" datetime="2021-11-09T07:42:52.620Z" itemprop="datePublished">Nov 9</time>
-</a>
+    <div class="e-content article-entry" itemprop="articleBody">
       
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2021/11/09/IOMulpitlexing/" class="archive-article-date">
-  <time class="dt-published" datetime="2021-11-09T07:42:52.593Z" itemprop="datePublished">Nov 9</time>
-</a>
-      
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2021/11/09/simpleRPC/" class="archive-article-date">
-  <time class="dt-published" datetime="2021-11-09T07:42:52.577Z" itemprop="datePublished">Nov 9</time>
-</a>
-      
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2021/11/08/testImage/" class="archive-article-date">
-  <time class="dt-published" datetime="2021-11-08T12:43:53.000Z" itemprop="datePublished">Nov 8</time>
-</a>
-      
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2021/11/08/testImage/">testImage</a>
-    </h1>
-  
+        <h2 id="JAVA-NIO简介"><a href="#JAVA-NIO简介" class="headerlink" title="JAVA NIO简介"></a>JAVA NIO简介</h2><p>Java New IO 是1.4引进的异步IO，与OIO相对应(old IO),由于之前的IO是阻塞的，效率较低，故引入了非阻塞的NIO，也叫做Non-Block IO</p>
+<h4 id="Java-NIO由三个核心部分组成"><a href="#Java-NIO由三个核心部分组成" class="headerlink" title="Java NIO由三个核心部分组成"></a>Java NIO由三个核心部分组成</h4><ol>
+<li>channel<br>在OIO中，一个连接的使用有两个流：输入流和输出流，分别进行读和写，而NIO使用了channel. channel可以看作是输入流和输出流的结合，连接的IO操作都可用channel来完成</li>
+<li>selector<br>channel实现多路复用的基础就是selector，将要进行状态查询的channel注册到selector中，selector内部不断轮询channel查看是否有IO事件(读、写、关闭连接等)，通过selector就能通过一个线程来管理多个channel了</li>
+<li>buffer<br>传统的IO是面向stream流的，而NIO是面向buffer缓冲区的，我们对channel的读写都是通过buffer的</li>
+</ol>
 
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2021/11/05/test/" class="archive-article-date">
-  <time class="dt-published" datetime="2021-11-05T09:13:28.384Z" itemprop="datePublished">Nov 5</time>
-</a>
       
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2021/11/05/test/">一级标题</a>
-    </h1>
-  
-
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2021/11/05/hello-world/" class="archive-article-date">
-  <time class="dt-published" datetime="2021-11-05T08:34:30.984Z" itemprop="datePublished">Nov 5</time>
-</a>
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2021/11/09/NIO/" data-id="ckvrse1oq000364whee163mib" data-title="" class="article-share-link">Share</a>
       
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2021/11/05/hello-world/">Hello World</a>
-    </h1>
-  
-
-    </header>
+      
+      
+    </footer>
   </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2021/11/09/RPC/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2021/11/09/IOMulpitlexing/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title"></div>
+    </a>
+  
+</nav>
+
+  
 </article>
-  
-  
-    </div></section>
-  
 
 
 </section>
